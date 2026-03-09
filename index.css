@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+[data-theme="light"] {
+  @apply bg-white text-gray-900 ;
+}
+
+[data-theme="dark"] {
+  @apply bg-gray-900 text-white;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
