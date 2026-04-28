@@ -1,76 +1,73 @@
 import Shimmer from "./Shimmer";
 import { useParams } from "react-router";
 import { useRestruntMenu } from "@hooks/useRestruantMenu";
+import RestruantCategory from "./RestruantCategory";
+import { useState } from "react";
+
+type Category = {
+  card: {
+    card: {
+      title: string;
+      itemCards: any[];
+    };
+  };
+};
 
 const RestruantMenu:React.FC = () => {
  const {resId} = useParams();
  const resInfo = useRestruntMenu(Number(resId));
- console.log("res", resId)
-  
-  
-  return resInfo.length === 0 ?
-   <Shimmer/> :(
-    <>
-    {resInfo.map((item: any)=>{
-        return (
-            <div key={item.info?.id} className="flex justify-between border-b py-6">
+ const[openIndex, setOpenIndex] = useState<number | null>(null);
+ const {name, costForTwo, cuisines, avgRating, totalRatingsString} = resInfo?.cards?.[2]?.card?.card?.info || {};
+ const { itemCards } = resInfo?.cards?.[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards?.[1]?.card?.card || {};
 
-      {/* LEFT SIDE */}
-      <div className="w-9/12 pr-6">
+let category = resInfo?.cards?.[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards?.filter((item: any)=> item?.card?.card?.["@type"] === "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory");
+ 
+  console.log("item", itemCards);
+  
+  return (
+    <div className="space-y-2 max-w-2xl mx-auto">
 
-        {/* veg icon */}
-        <div className="w-4 h-4 border-2 border-green-600 flex items-center justify-center mb-2">
-          <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+      {/* Rating + price row */}
+      <div className="flex items-center text-gray-800 font-semibold text-lg">
+
+            {/* Category link */}
+      <div
+        className="text-orange-500 font-semibold text-lg"
+      >
+        {name}
+      </div>
+
+        {/* Rating badge */}
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-600 text-white text-sm mr-2">
+          ★
         </div>
 
-        {/* title */}
-        <h3 className="text-lg font-semibold text-gray-800">
-          {item.info?.name}
-        </h3>
+        {/* Rating text */}
+        <span className="mr-2">{avgRating} ({totalRatingsString})</span>
 
-        {/* price */}
-        <p className="text-gray-800 font-medium mt-1">
-          ₹{item.info?.costForTwo / 100} for two
-          <span className="text-green-700 text-sm ml-2">
-            60% OFF USE TRYNEW
-          </span>
-        </p>
+        {/* Dot */}
+        <span className="mx-2 text-gray-400">•</span>
 
-        {/* rating */}
-        <p className="text-green-700 text-sm mt-1">
-          ⭐ {item.info?.avgRating} ({item.info?.totalRatings})
-        </p>
-
-        {/* description */}
-        <p className="text-gray-500 text-sm mt-2 leading-relaxed">
-          {item.info.description}
-        </p>
+        {/* Price */}
+        <span>{costForTwo}</span>
       </div>
-
-      {/* RIGHT SIDE IMAGE */}
-      <div className="relative w-32 h-28">
-
-        {/* <img
-          src={IMG_URL + imageId}
-          alt={name}
-          className="w-full h-full object-cover rounded-lg"
-        /> */}
-
-        {/* ADD button */}
-        <button className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white border shadow px-6 py-1 rounded-md text-sm text-green-600 font-semibold">
-          ADD
-        </button>
-      </div>
+       {category?.map((item:Category, index: number)=> (  
+              <RestruantCategory 
+              key={item.card?.card?.title ?? index} 
+              title={item.card?.card?.title} 
+              items = {item.card?.card?.itemCards || []}
+              index={index}
+              openIndex={openIndex}
+              setOpenIndex={setOpenIndex}
+              />
+     ) )} 
+     
+  
 
     </div>
 
-        )
-    }
-      
-    )}
-    </>
-
+    
 )
 }
 
-export default RestruantMenu
+export default RestruantMenu;

@@ -8,6 +8,7 @@
     "jsx": "react-jsx",
     "strict": true,
     "baseUrl": "./src",
+    "types": ["jest", "node", "@testing-library/jest-dom"],
     "paths": {
       //"@/*": ["src/*"],
       "@components/*": ["components/*"],

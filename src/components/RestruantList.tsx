@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import RestruantCard from "@components/RestruantCard";
+import { useEffect, useState } from "react";
+import RestruantCard, { withVegTag } from "@components/RestruantCard";
 import Shimmer from "@components/Shimmer";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRestruant } from "@utils/api";
@@ -8,13 +8,14 @@ import { useFilter } from "@utils/useFilter";
 import useIntersectionObserver from "@utils/useIntersectionObserver";
 
 
-export const RestruantList: React.FC = () => {
+const RestruantList: React.FC = () => {
 const[ratingFilter, setRatingFilter] = useState<number>(0);
 const[searchTerm, setSearchTerm] = useState<string>("");
 const[debounceSearchTerm, setDebounceSearchTerm] = useState<string>("");
 const [foodType, setFoodType] = useState<FoodType>("All");
 //const loadMoreref = useRef <HTMLDivElement |  null>(null);
 const {targetRef, intersectionEntry} = useIntersectionObserver();
+const RestruantCardVegTag = withVegTag(RestruantCard);
 
   const { data, isLoading, isError } = useQuery<Restruant[]>({
     queryKey:["restruant", debounceSearchTerm, ratingFilter], // unique cache key
@@ -85,17 +86,22 @@ const {targetRef, intersectionEntry} = useIntersectionObserver();
 
       {/* Cards Grid */}
       <div  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredData?.map((restrunants: Restruant) => (
-          <RestruantCard
-            key={restrunants.info.id}
-            image={restrunants.info.cloudinaryImageId}
-            avgRating={restrunants.info.avgRating}
-            title={restrunants.info.name}
-            costForTwo={restrunants.info.costForTwo}
-            sla={restrunants.info.sla?.slaString}
-            description={restrunants.info.cuisines.join(", ")}
-          />
-        ))}
+        {filteredData?.map((restrunants: Restruant) => {
+        const info = restrunants.info;
+        console.log("info", info.veg)
+        const props = {
+            image:info.cloudinaryImageId,
+            avgRating: info.avgRating,
+            title: info.name,
+            costForTwo: info.costForTwo,
+            sla: info.sla?.slaString,
+            description: info.cuisines.join(", ")
+        }
+        return  info.veg ? <RestruantCardVegTag key={info.id}  {...props} />
+         :
+            <RestruantCard key={info.id} {...props}/>
+      }
+        )}
       </div>
       <div ref={targetRef} className="h-10 flex justify-center items-center">
            Loading more...
@@ -115,3 +121,5 @@ const {targetRef, intersectionEntry} = useIntersectionObserver();
     </div>
   );
 };
+
+export default RestruantList;

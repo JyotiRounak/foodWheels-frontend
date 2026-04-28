@@ -37,4 +37,21 @@ const RestruantCard: React.FC<CardProps> = ({ image, title, avgRating, descripti
   );
 };
 
+//higher order component 
+// input: RestruantCard - output: restruantCard with veg tag 
+
+export const withVegTag = (RestruantCard: React.FC<CardProps>) => {
+  return (props: CardProps)=>{
+    return (
+    <div className="relative">
+      <div className="absolute top-0 left-0 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-br z-10">
+        Veg
+      </div>
+      <RestruantCard {...props} />
+    </div>
+  )
+  }
+  
+}
+
 export default React.memo(RestruantCard);
